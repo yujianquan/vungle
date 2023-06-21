@@ -38,7 +38,7 @@ export default class Calender{
                 hour ++;
                 minutes = 0
             }
-            if(hour == 24){
+            if(hour == 24 && minutes == 30){
                 hour = 0
                 week ++
             }
