@@ -1,18 +1,19 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <layout-component />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import LayoutComponent from './components/layout'
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
+    name: 'App',
+    components: {
+        LayoutComponent
+    },
+    methods:{
+        
+    }
 }
 </script>
 
@@ -24,5 +25,23 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+body,
+html {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
+
+/* variable */
+:root {
+    /* --color-primary: rgb(42, 170, 233); */
+    --color-primary: #4f86f8;
+    /* --font-size-primary: 16px; */
+    --font-color-primary: #333;
+    --font-size-primary: 12px;
+    --color-border: #ccc;
+    --color-grid-hover: #eee;
+    --color-grid-selected: var(--color-primary);
 }
 </style>
