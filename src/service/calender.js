@@ -1,4 +1,5 @@
 import DateNode from "./dateNode"
+import { cloneDeep } from 'lodash'
 
 export default class Calender{
     constructor(){
@@ -14,8 +15,16 @@ export default class Calender{
         this.isDragging = false
         // 保存每隔半小时的时间数据
         this.dateList = []
-        // 计算已选择的数据
-        this.checkedList = []
+        // 计算已选择的数据，分组（周一周二等）保存
+        this.checkedMapList = {
+            1:[],
+            2:[],
+            3:[],
+            4:[],
+            5:[],
+            6:[],
+            7:[]
+        }
 
         this.init()
     }
@@ -86,6 +95,7 @@ export default class Calender{
                     date.setChecked(!date.isChecked)
                 }
             })
+            this.calcCheckedTimePeriod()
         }else{
             // 如果是在拖动，就批量处理
             if (this.pointsIsEqual(this.startIndex, this.endIndex)) {
@@ -109,8 +119,8 @@ export default class Calender{
             return
         }
         // 用week，hour，minetes三者的关系来计算精确数据（也不用了，生成了唯一key就可以代替了）
-        const {key:startKey} = this.startIndex
-        const {key:endKey} = this.endIndex
+        const { key:startKey } = this.startIndex
+        const { key:endKey } = this.endIndex
         // 根据dateNode的唯一key，算出应该checked哪部分数据
         const dateStartIndex = this.dateList.findIndex((date) => date.key === startKey)
         const dateEndIndex = this.dateList.findIndex((date) =>  date.key === endKey)
@@ -119,10 +129,25 @@ export default class Calender{
                 date.setChecked(true)
             }
         })
+        // 拖动以后重新计算当前已选时段
+        this.calcCheckedTimePeriod()
     }
     // 计算已选择时段
     calcCheckedTimePeriod(){
-        
+        const copyDateList = cloneDeep(this.dateList)
+        let week = 1
+        // 思路是，将7天的datelist分块,每天分为48个时间片段，将每天的已选项存入checkedMapList中
+        const PERIOD = 48
+        // eslint-disable-next-line no-constant-condition
+        while(true){
+            if(copyDateList.length && week < 8){
+                let dateList = copyDateList.splice(0,PERIOD)
+                this.checkedMapList[week] = dateList.filter(date => date.isChecked)
+                week ++
+            }else{
+                break
+            }
+        }
     }
     // 清除选中
     clearIndex() {

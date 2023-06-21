@@ -24,12 +24,12 @@
             <tr> 
                 <td v-for="i in 24" :key="'time_' + i" colspan="2" class="font-primary tac content-padding">{{i - 1}}</td>
             </tr>
-            <tr v-for="(grid,index) in canlender.week" :key="index">
+            <tr v-for="(grid,index) in calender.week" :key="index">
                 <td class="font-primary tac" width="75">
                     {{grid}}
                 </td>
                 <td 
-                    v-for="time in canlender.dateList.slice(index*48,index*48 + 48)" 
+                    v-for="time in calender.dateList.slice(index*48,index*48 + 48)" 
                     class="selectable-grid content-padding" 
                     :class="{'selected': time.isChecked}" 
                     :key="time.key"
@@ -48,22 +48,22 @@
     </div>
 </template>
 <script>
-import Canlender from '../service/canlender'
+import Calender from '../service/calender'
 export default {
     name:"LayoutComponent",
     data(){
         return {
-            canlender:null
+            calender:null
         }
     },
     methods:{
         onMouseDown(e) {
             const target = e.target;
             if (!target.classList.contains('selectable-grid')) {
-                this.canlender.clearIndex();
+                this.calender.clearIndex();
                 return;
             }
-            this.canlender.delayMouseDown(target.dataset)
+            this.calender.delayMouseDown(target.dataset)
             
             document.addEventListener('mousemove', this.onMouseMove);
         },
@@ -71,7 +71,7 @@ export default {
             const target = e.target;
             document.removeEventListener('mousemove', this.onMouseMove);
             
-            this.canlender.delayMouseUp(target.dataset)
+            this.calender.delayMouseUp(target.dataset)
           
         },
         onMouseMove(e) {
@@ -79,12 +79,13 @@ export default {
           if (!target.classList.contains('selectable-grid')) {
             return;
           }
-          this.canlender.delayMouseMove(target.dataset)
+          this.calender.delayMouseMove(target.dataset)
         },
     },
 
     created(){
-        this.canlender = new Canlender()
+        // 初始化组件
+        this.calender = new Calender()
     },
 
     mounted() {
