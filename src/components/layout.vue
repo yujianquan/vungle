@@ -41,13 +41,18 @@
             </tr>
             <tr>
                 <td colspan="49" class="font-primary tac">
-                    <div>选择结果展示</div>
-                    {{hasChecked}}
-                    <template v-for="w in 7">
-                        <div class="week-line" :key="w" v-if="calender.checkedMapList[w].length">
-                            <label>{{w}}</label>
-                            <div class="cont">{{formatCheckedDate(calender.checkedMapList[w])}}</div>
+                    <div v-if="!hasChecked">可拖动鼠标进行排序</div>
+                    <template v-else>
+                        <div class="checked-time-head">
+                            <span>已选择时间段</span>
+                            <div class="clear" @click="clear">清空</div>
                         </div>
+                        <template v-for="w in 7">
+                            <div class="week-line" :key="w" v-if="calender.checkedMapList[w].length">
+                                <label class="week-line-label">{{calender.week[w - 1]}}</label>
+                                <div class="count">{{formatCheckedDatePeriod(calender.checkedMapList[w])}}</div>
+                            </div>
+                        </template>
                     </template>
                 </td>
             </tr>
@@ -86,6 +91,7 @@ export default {
         }
     },
     methods:{
+        // 所有操作反馈给Calender，让calendar来做数据处理
         onMouseDown(e) {
             const target = e.target;
             if (!target.classList.contains('selectable-grid')) {
@@ -110,32 +116,30 @@ export default {
           }
           this.calender.delayMouseMove(target.dataset)
         },
+        clear(){
+            this.calender.clearSelect()
+        },
         /**
-         * @param dateArray 是周一周二周三等返回的已选择的时间，需要格式化成[00:00 ~ 00:30]的格式,并且计算出连续时间段
+         * @param dateArray 是周一周二周三等返回的已选择的时间，并且计算出连续时间段
          */
-        formatCheckedDate(dateArray){
-            console.log(dateArray);
+        formatCheckedDatePeriod(dateArray){
             if(!dateArray || !dateArray.length) return
             let array = deepCopy(dateArray)
             const keys = array.reduce((k,a) => {
                 k.push(a.key)
                 return k
             },[])
-            console.log(keys);
             let tempArray = []
             let index = 0
             // eslint-disable-next-line no-constant-condition
             while(true){
                 if(!array.length) break
                 let dateNode = array.shift()
-                console.log(dateNode);
                 if(!tempArray[index]) {
                     tempArray[index] = []
                 }
                 tempArray[index].push(dateNode)
-                console.log(dateNode.next);
                 if(keys.includes(dateNode.next)) {
-                    console.log('here');
                     // eslint-disable-next-line no-constant-condition
                     while(true){
                         let nextNodeKey = dateNode.next
@@ -150,8 +154,49 @@ export default {
                     index ++
                 }
             }
-            console.log(tempArray);
-            return tempArray
+            return this.formatCheckedDateString(tempArray)
+        },
+        /**
+         * 将一段一段的时间数据，格式化成00:30~01:30这种格式
+         */
+        formatCheckedDateString(dateTwoDimensionArray){
+            let stringArray = []
+            // 传入的是一个二维数组[[date],[date,date,date]]的形式，要把这种形式再转换成string
+            dateTwoDimensionArray.forEach(dateArray => {
+                if(!dateArray.length) return ''
+                // 计算出起始时间，要比点击的第一个点的时间段少30分钟，比如勾选的是00:30,那么起始时间就为00:00
+                let startNode = dateArray[0]
+                let endNode = dateArray[dateArray.length -1]
+                let startTime = {
+                    hour:'',
+                    minutes:''
+                }
+                if(startNode.minutes == 30){
+                    startTime.hour = startNode.hour
+                    startTime.minutes = 0
+                }else{
+                    startTime.hour = startNode.hour-1
+                    startTime.minutes = 30
+                }
+                // 如果分片数据为1，则表示只勾选了一格时间，左右不连片
+                if(dateArray.length === 1){
+                    stringArray.push(`${this.complateDateString(startTime.hour)}:${this.complateDateString(startTime.minutes)} ~ ${this.complateDateString(startNode.hour)}:${this.complateDateString(startNode.minutes)}`)
+                // 时间连片并且长度为48，那就表示已经勾选了这一天
+                }else if(dateArray.length === 48){
+                    stringArray.push('全天')
+                } else {
+                    stringArray.push(`${this.complateDateString(startTime.hour)}:${this.complateDateString(startTime.minutes)} ~ ${this.complateDateString(endNode.hour)}:${this.complateDateString(endNode.minutes)}`)
+                }
+            })
+            return stringArray.toString()
+            
+        },
+
+        complateDateString(date){
+            if(+date < 10){
+                return '0' + date
+            }
+            return date
         }
     },
 
@@ -165,7 +210,7 @@ export default {
     },
 
     beforeDestroy() {
-        document.removeEventListener('mouseup', this.onMouseMove);
+        document.removeEventListener('mouseup', this.onMouseUp);
     },
 }
 </script>
@@ -252,5 +297,32 @@ td.content-padding {
 
 .selectable-grid.in-drag {
     background-color: var(--color-grid-selected);
+}
+
+.week-line{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 8px;
+}
+.week-line-label{
+    width: 80px;
+    white-space: nowrap;
+}
+.count{
+    flex: 1;
+    text-align: left;
+    max-width: 600px;
+    white-space: normal;
+}
+.checked-time-head{
+    position: relative;
+}
+.clear{
+    color: var(--color-primary);
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 </style>

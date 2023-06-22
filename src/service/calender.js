@@ -3,10 +3,7 @@ import { deepCopy } from '../util/index'
 
 export default class Calender{
     constructor(){
-        this.week = ['一', '二', '三', '四', '五', '六', '日']
-        // 保存拖拽区域数据(不需要了，datenode的check事件代替了)
-        // this.dragArea = new Set()
-
+        this.week = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
         // 点击起点
         this.startIndex = null
         // 点击终点
@@ -16,15 +13,7 @@ export default class Calender{
         // 保存每隔半小时的时间数据
         this.dateList = []
         // 计算已选择的数据，分组（周一周二等）保存
-        this.checkedMapList = {
-            1:[],
-            2:[],
-            3:[],
-            4:[],
-            5:[],
-            6:[],
-            7:[]
-        }
+        this.checkedMapList = {1:[],2:[],3:[],4:[],5:[],6:[],7:[]}
 
         this.init()
     }
@@ -136,7 +125,7 @@ export default class Calender{
         // 拖动以后重新计算当前已选时段
         this.calcCheckedTimePeriod()
     }
-    // 计算已选择时段
+    // 计算已选择时段，只做时段的计算，导出所有数据，展示方面放在第三方，这里不做数据的处理
     calcCheckedTimePeriod(){
         let copyDateList = deepCopy(this.dateList)
         let week = 1
@@ -152,6 +141,14 @@ export default class Calender{
                 break
             }
         }
+    }
+    // 清楚已选项
+    clearSelect(){
+        this.dateList.forEach(date => {
+            date.setChecked(false)
+        })
+        
+        this.checkedMapList = {1:[],2:[],3:[],4:[],5:[],6:[],7:[]}
     }
     // 清除选中
     clearIndex() {
