@@ -4,6 +4,8 @@ export default class DateNode{
         this.hour = options.hour || 0
         this.minutes = options.minutes || 0
         this.key = options.key || ''
+        // 构造一个链表结构的数据
+        this.next = null
 
         // 有没有选中此时段
         this.isChecked = false

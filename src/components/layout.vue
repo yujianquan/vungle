@@ -42,6 +42,13 @@
             <tr>
                 <td colspan="49" class="font-primary tac">
                     <div>选择结果展示</div>
+                    {{hasChecked}}
+                    <template v-for="w in 7">
+                        <div class="week-line" :key="w" v-if="calender.checkedMapList[w].length">
+                            <label>{{w}}</label>
+                            <div class="cont">{{formatCheckedDate(calender.checkedMapList[w])}}</div>
+                        </div>
+                    </template>
                 </td>
             </tr>
         </table>
@@ -49,11 +56,33 @@
 </template>
 <script>
 import Calender from '../service/calender'
+import { deepCopy } from '../util/index'
 export default {
     name:"LayoutComponent",
     data(){
         return {
+            // 初始化calendar，只是提前放置一些key，后续会被new Calender覆盖
             calender:null
+        }
+    },
+    computed:{
+        // 计算是否有选中
+        hasChecked(){
+            // keys是周一周二周三周四等等
+            const keys = Object.keys(this.calender.checkedMapList)
+            let hasNodeChecked = false
+            try {
+                 keys.forEach(key => {
+                    // 判断周一周二周三周四等等对应的已选项为不为空
+                    if(this.calender.checkedMapList[key].length){
+                        hasNodeChecked = true
+                    }
+                })
+            } catch (error) {
+                return false
+            }
+
+            return hasNodeChecked
         }
     },
     methods:{
@@ -81,6 +110,49 @@ export default {
           }
           this.calender.delayMouseMove(target.dataset)
         },
+        /**
+         * @param dateArray 是周一周二周三等返回的已选择的时间，需要格式化成[00:00 ~ 00:30]的格式,并且计算出连续时间段
+         */
+        formatCheckedDate(dateArray){
+            console.log(dateArray);
+            if(!dateArray || !dateArray.length) return
+            let array = deepCopy(dateArray)
+            const keys = array.reduce((k,a) => {
+                k.push(a.key)
+                return k
+            },[])
+            console.log(keys);
+            let tempArray = []
+            let index = 0
+            // eslint-disable-next-line no-constant-condition
+            while(true){
+                if(!array.length) break
+                let dateNode = array.shift()
+                console.log(dateNode);
+                if(!tempArray[index]) {
+                    tempArray[index] = []
+                }
+                tempArray[index].push(dateNode)
+                console.log(dateNode.next);
+                if(keys.includes(dateNode.next)) {
+                    console.log('here');
+                    // eslint-disable-next-line no-constant-condition
+                    while(true){
+                        let nextNodeKey = dateNode.next
+                        let nextIndex = array.findIndex(a => a.key === nextNodeKey)
+                        if(!nextIndex) break
+                        
+                        tempArray[index].push(array[nextIndex])
+                        dateNode = array[nextIndex]
+                        array.splice(nextIndex,1)
+                    }
+                }else{
+                    index ++
+                }
+            }
+            console.log(tempArray);
+            return tempArray
+        }
     },
 
     created(){

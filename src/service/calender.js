@@ -1,5 +1,5 @@
 import DateNode from "./dateNode"
-import { cloneDeep } from 'lodash'
+import { deepCopy } from '../util/index'
 
 export default class Calender{
     constructor(){
@@ -51,6 +51,9 @@ export default class Calender{
                 hour = 0
                 week ++
             }
+            // 将node以链表的形式串联起来，方便后续查找连续节点
+            let length = this.dateList.length
+            length && (this.dateList[length-1].next = key)
             this.dateList.push(new DateNode({week,hour,minutes,key}))
         }
     }
@@ -87,6 +90,7 @@ export default class Calender{
 
         this.calcDragArea()
     }
+
     delayMouseUp({ key }){
         // 如果当前没有在拖动，就处理单点击事件
         if(!this.isDragging){
@@ -134,7 +138,7 @@ export default class Calender{
     }
     // 计算已选择时段
     calcCheckedTimePeriod(){
-        const copyDateList = cloneDeep(this.dateList)
+        let copyDateList = deepCopy(this.dateList)
         let week = 1
         // 思路是，将7天的datelist分块,每天分为48个时间片段，将每天的已选项存入checkedMapList中
         const PERIOD = 48
