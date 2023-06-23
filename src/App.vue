@@ -1,16 +1,14 @@
 <template>
   <div id="app">
-    <calender-comp />
+    <auto-calender />
   </div>
 </template>
 
 <script>
-import CalenderComp from './components/Calender.vue'
+
 export default {
     name: 'App',
-    components: {
-        CalenderComp
-    },
+    components: {},
     methods:{
         
     }

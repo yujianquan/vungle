@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
+import AutoCalender from '../packages/index.js'
+Vue.component('AutoCalender',AutoCalender)
 
 Vue.config.productionTip = false
 
