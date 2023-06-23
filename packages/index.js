@@ -6,12 +6,10 @@ const components = [ AutoCalender ]
 const install = function(Vue){
     components.map(component => {
         Vue.use(component)
-        console.log(component);
     })
 }
 
 if (typeof window !== 'undefined' && window.Vue) {
-    console.log('install vue');
     install(window.Vue)
 }
 
