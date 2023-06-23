@@ -14,6 +14,8 @@ export default class Calender{
         this.dateList = []
         // 计算已选择的数据，分组（周一周二等）保存
         this.checkedMapList = {1:[],2:[],3:[],4:[],5:[],6:[],7:[]}
+        // 添加拖动数据，处理勾选了以后不能取消的bug
+        this.dragArea = []
 
         this.init()
     }
@@ -83,53 +85,52 @@ export default class Calender{
     delayMouseUp({ key }){
         // 如果当前没有在拖动，就处理单点击事件
         if(!this.isDragging){
+            console.log(key);
             this.dateList.forEach(date => {
-                if(date.key === key){
+                if(date.key == key){
                     date.setChecked(!date.isChecked)
                 }
             })
-            this.calcCheckedTimePeriod()
+            this.checkedTimePeriod()
         }else{
             // 如果是在拖动，就批量处理
             if (this.pointsIsEqual(this.startIndex, this.endIndex)) {
                 this.clearIndex();
                 return;
             }
-            this.calcDragArea()
+            this.calcSelectNode()
         }
-
+        this.dragArea = []
         this.isDragging = false;
         this.startIndex = null;
         this.endIndex = null;
+    }
+    calcDragArea(){
+        this.dragArea = []
+        const { max, min } = this.getMaxAndMinIndex()
+        this.dateList.forEach((date,index) => {
+            if(index >= min && index <= max){
+                this.dragArea.push(date.key)
+            }
+        })
     }
     // 判断两个点是否全等
     pointsIsEqual(p1,p2){
         return p1 && p2 && p1.week === p2.week && p1.hour === p2.hour && p1.minutes === p2.minutes
     }
     // 计算拖拽的区域，计算谁该高亮
-    calcDragArea(){
-        if (!this.startIndex || !this.endIndex) {
-            return
-        }
-        // 用week，hour，minetes三者的关系来计算精确数据（也不用了，生成了唯一key就可以代替了）
-        const { key:startKey } = this.startIndex
-        const { key:endKey } = this.endIndex
-        // 根据dateNode的唯一key，算出应该checked哪部分数据
-        const dateStartIndex = this.dateList.findIndex((date) => date.key === startKey)
-        const dateEndIndex = this.dateList.findIndex((date) =>  date.key === endKey)
-        // 处理不能往回拖动的bug
-        const maxIndex = Math.max(dateStartIndex,dateEndIndex)
-        const minIndex = Math.min(dateStartIndex,dateEndIndex)
+    calcSelectNode(){
+        const { max, min } = this.getMaxAndMinIndex()
         this.dateList.forEach((date,index) => {
-            if(index >= minIndex && index <= maxIndex){
+            if(index >= min && index <= max){
                 date.setChecked(true)
             }
         })
         // 拖动以后重新计算当前已选时段
-        this.calcCheckedTimePeriod()
+        this.checkedTimePeriod()
     }
     // 计算已选择时段，只做时段的计算，导出所有数据，展示方面放在第三方，这里不做数据的处理
-    calcCheckedTimePeriod(){
+    checkedTimePeriod(){
         let copyDateList = deepCopy(this.dateList)
         let week = 1
         // 思路是，将7天的datelist分块,每天分为48个时间片段，将每天的已选项存入checkedMapList中
@@ -144,6 +145,29 @@ export default class Calender{
                 break
             }
         }
+    }
+    // 根据点击或者拖动的数据，计算出勾选的最小最大的index值
+    getMaxAndMinIndex(){
+        let result = { max:0, min:0 }
+
+        if (!this.startIndex || !this.endIndex) {
+            return result
+        }
+        // 用week，hour，minetes三者的关系来计算精确数据（也不用了，生成了唯一key就可以代替了）
+        const { key:startKey } = this.startIndex
+        const { key:endKey } = this.endIndex
+        // 根据dateNode的唯一key，算出应该checked哪部分数据
+        const dateStartIndex = this.dateList.findIndex((date) => date.key === startKey)
+        const dateEndIndex = this.dateList.findIndex((date) =>  date.key === endKey)
+        // 处理不能往回拖动的bug
+        const maxIndex = Math.max(dateStartIndex,dateEndIndex)
+        const minIndex = Math.min(dateStartIndex,dateEndIndex)
+
+        result.max = maxIndex
+        result.min = minIndex
+
+        return result
+
     }
     selectGoldPeriodByType(type){
         const key = type === 'work' ? 'isWorkGoldTime' : 'isWeekendGoldTime'

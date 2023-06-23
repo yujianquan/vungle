@@ -31,7 +31,7 @@
                 <td 
                     v-for="time in calender.dateList.slice(index*48,index*48 + 48)" 
                     class="selectable-grid content-padding" 
-                    :class="{'selected': time.isChecked}" 
+                    :class="{'selected': time.isChecked,'in-drag':calender.dragArea.includes(time.key)}" 
                     :key="time.key"
                     :data-week='time.week'
                     :data-hour='time.hour'
