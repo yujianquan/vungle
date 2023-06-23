@@ -1,4 +1,6 @@
 module.exports = {
+    verbose:false,
+    
     moduleFileExtensions: [
         'js',
         'vue'

@@ -45,7 +45,7 @@
                     <template v-else>
                         <div class="checked-time-head">
                             <span>已选择时间段</span>
-                            <div class="clear" @click="clear">清空</div>
+                            <div id="clear" class="clear" @click="clear">清空</div>
                         </div>
                         <template v-for="w in 7">
                             <div class="week-line" :key="w" v-if="calender.checkedMapList[w].length">
