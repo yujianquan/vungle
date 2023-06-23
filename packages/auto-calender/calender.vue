@@ -1,6 +1,6 @@
 
 <script>
-import CalenderComp from '@/components/Calender.vue'
+import CalenderComp from '@/components/Calender'
 export default {
     name:"AutoCalender",
     components:{

@@ -31,15 +31,5 @@ html {
     font-size: 16px;
 }
 
-/* variable */
-:root {
-    /* --color-primary: rgb(42, 170, 233); */
-    --color-primary: #4f86f8;
-    /* --font-size-primary: 16px; */
-    --font-color-primary: #333;
-    --font-size-primary: 12px;
-    --color-border: #ccc;
-    --color-grid-hover: #eee;
-    --color-grid-selected: var(--color-primary);
-}
+
 </style>
