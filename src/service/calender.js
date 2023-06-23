@@ -117,8 +117,11 @@ export default class Calender{
         // 根据dateNode的唯一key，算出应该checked哪部分数据
         const dateStartIndex = this.dateList.findIndex((date) => date.key === startKey)
         const dateEndIndex = this.dateList.findIndex((date) =>  date.key === endKey)
+        // 处理不能往回拖动的bug
+        const maxIndex = Math.max(dateStartIndex,dateEndIndex)
+        const minIndex = Math.min(dateStartIndex,dateEndIndex)
         this.dateList.forEach((date,index) => {
-            if(index >= dateStartIndex && index <= dateEndIndex){
+            if(index >= minIndex && index <= maxIndex){
                 date.setChecked(true)
             }
         })
@@ -142,13 +145,22 @@ export default class Calender{
             }
         }
     }
+    selectGoldPeriodByType(type){
+        const key = type === 'work' ? 'isWorkGoldTime' : 'isWeekendGoldTime'
+        this.dateList.forEach(date => {
+            if(date[key]){
+                date.setChecked(true)
+            }
+        })
+    }
     // 清楚已选项
     clearSelect(){
         this.dateList.forEach(date => {
             date.setChecked(false)
         })
-        
-        this.checkedMapList = {1:[],2:[],3:[],4:[],5:[],6:[],7:[]}
+        Object.keys(this.checkedMapList).forEach(c => {
+            this.checkedMapList[c] = []
+        })
     }
     // 清除选中
     clearIndex() {

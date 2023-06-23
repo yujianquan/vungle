@@ -53,6 +53,10 @@
                                 <div class="count">{{formatCheckedDatePeriod(calender.checkedMapList[w])}}</div>
                             </div>
                         </template>
+                        <div class="op-content">
+                            <div class="weekday gold-button" @click="checkDefaultTimeByType('work')">选中周内黄金时段</div>
+                            <div class="sunday gold-button" @click="checkDefaultTimeByType('sunday')">选中周末黄金时段</div>
+                        </div>
                     </template>
                 </td>
             </tr>
@@ -119,6 +123,9 @@ export default {
         clear(){
             this.calender.clearSelect()
         },
+        checkDefaultTimeByType(type){
+            this.calender.selectGoldPeriodByType(type)
+        },
         /**
          * @param dateArray 是周一周二周三等返回的已选择的时间，并且计算出连续时间段
          */
@@ -181,9 +188,6 @@ export default {
                 // 如果分片数据为1，则表示只勾选了一格时间，左右不连片
                 if(dateArray.length === 1){
                     stringArray.push(`${this.complateDateString(startTime.hour)}:${this.complateDateString(startTime.minutes)} ~ ${this.complateDateString(startNode.hour)}:${this.complateDateString(startNode.minutes)}`)
-                // 时间连片并且长度为48，那就表示已经勾选了这一天
-                }else if(dateArray.length === 48){
-                    stringArray.push('全天')
                 } else {
                     stringArray.push(`${this.complateDateString(startTime.hour)}:${this.complateDateString(startTime.minutes)} ~ ${this.complateDateString(endNode.hour)}:${this.complateDateString(endNode.minutes)}`)
                 }
@@ -324,5 +328,18 @@ td.content-padding {
     position: absolute;
     top: 0;
     right: 0;
+}
+.op-content{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.gold-button{
+    /* width: 150px; */
+    border: 1px solid var(--color-border);
+    padding: 4px 8px;
+    color: var(--color-primary);
+    margin: 0 8px;
+    cursor: pointer;
 }
 </style>
