@@ -1,7 +1,7 @@
-import DateNode from "./dateNode"
+import DateNode from "./DateNode.js"
 import { deepCopy } from '../util/index'
 
-export default class Calender{
+export default class DateManager{
     constructor(){
         this.week = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
         // 点击起点
@@ -49,13 +49,12 @@ export default class Calender{
         }
     }
     /**
-     * 处理鼠标down事件
      * @param {number} week 周几
      * @param {number} hour 小时
      * @param {number} minutes 分钟
      * @param {*} key 唯一id
      */
-    delayMouseDown({ week, hour, minutes,key }){
+    delayDateNodeLick({ week, hour, minutes,key }){
         this.startIndex = {
             week: +week,
             hour: +hour,
@@ -64,13 +63,12 @@ export default class Calender{
         }
     }
     /**
-     * 处理鼠标move事件
      * @param {number} week 周几
      * @param {number} hour 小时
      * @param {number} minutes 分钟
      * @param {*} key 唯一id
      */
-    delayMouseMove({ week, hour, minutes,key }){
+    delayBatchChoose({ week, hour, minutes,key }){
         this.isDragging = true;
         this.endIndex = {
             week: +week,
@@ -82,7 +80,7 @@ export default class Calender{
         this.calcDragArea()
     }
 
-    delayMouseUp({ key }){
+    comfirmChoose({ key }){
         // 如果当前没有在拖动，就处理单点击事件
         if(!this.isDragging){
             this.dateList.forEach(date => {

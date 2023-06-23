@@ -15,3 +15,11 @@ export const deepCopy = function(obj){
 
     return newObj
 }
+
+export const completeDateString = function(date){
+    if(+date < 10){
+        return '0' + date
+    }
+
+    return date
+}

@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <layout-component />
+    <calender-comp />
   </div>
 </template>
 
 <script>
-import LayoutComponent from './components/layout'
+import CalenderComp from './components/Calender.vue'
 export default {
     name: 'App',
     components: {
-        LayoutComponent
+        CalenderComp
     },
     methods:{
         

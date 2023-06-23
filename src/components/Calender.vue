@@ -1,6 +1,6 @@
 <template>
     <div class="layout-component" @mousedown="onMouseDown">
-        <!-- 为了简便，就先用table实现效果 -->
+        <!-- 为了简便，就先用table快速实现效果，后续需要将table改为div -->
         <table class="component-table">
             <tr>
                 <td colspan="49">
@@ -64,10 +64,10 @@
     </div>
 </template>
 <script>
-import Calender from '../service/calender'
-import { deepCopy } from '../util/index'
+import DateManager from '../service/DateManager'
+import { deepCopy,completeDateString } from '../util/index'
 export default {
-    name:"LayoutComponent",
+    name:"CalenderComp",
     data(){
         return {
             // 初始化calendar，只是提前放置一些key，后续会被new Calender覆盖
@@ -95,14 +95,14 @@ export default {
         }
     },
     methods:{
-        // 所有操作反馈给Calender，让calendar来做数据处理
+        // 所有操作反馈给Calender，让calender来做数据处理
         onMouseDown(e) {
             const target = e.target;
             if (!target.classList.contains('selectable-grid')) {
                 this.calender.clearIndex();
                 return;
             }
-            this.calender.delayMouseDown(target.dataset)
+            this.calender.delayDateNodeLick(target.dataset)
             
             document.addEventListener('mousemove', this.onMouseMove);
         },
@@ -110,7 +110,7 @@ export default {
             const target = e.target;
             document.removeEventListener('mousemove', this.onMouseMove);
             
-            this.calender.delayMouseUp(target.dataset)
+            this.calender.comfirmChoose(target.dataset)
           
         },
         onMouseMove(e) {
@@ -118,7 +118,7 @@ export default {
           if (!target.classList.contains('selectable-grid')) {
             return;
           }
-          this.calender.delayMouseMove(target.dataset)
+          this.calender.delayBatchChoose(target.dataset)
         },
         clear(){
             this.calender.clearSelect()
@@ -187,26 +187,21 @@ export default {
                 }
                 // 如果分片数据为1，则表示只勾选了一格时间，左右不连片
                 if(dateArray.length === 1){
-                    stringArray.push(`${this.complateDateString(startTime.hour)}:${this.complateDateString(startTime.minutes)} ~ ${this.complateDateString(startNode.hour)}:${this.complateDateString(startNode.minutes)}`)
+                    stringArray.push(`${completeDateString(startTime.hour)}:${completeDateString(startTime.minutes)} ~ ${completeDateString(startNode.hour)}:${completeDateString(startNode.minutes)}`)
                 } else {
-                    stringArray.push(`${this.complateDateString(startTime.hour)}:${this.complateDateString(startTime.minutes)} ~ ${this.complateDateString(endNode.hour)}:${this.complateDateString(endNode.minutes)}`)
+                    stringArray.push(`${completeDateString(startTime.hour)}:${completeDateString(startTime.minutes)} ~ ${completeDateString(endNode.hour)}:${completeDateString(endNode.minutes)}`)
                 }
             })
             return stringArray.toString()
             
         },
 
-        complateDateString(date){
-            if(+date < 10){
-                return '0' + date
-            }
-            return date
-        }
+        
     },
 
     created(){
         // 初始化组件
-        this.calender = new Calender()
+        this.calender = new DateManager()
     },
 
     mounted() {
