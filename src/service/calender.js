@@ -85,7 +85,6 @@ export default class Calender{
     delayMouseUp({ key }){
         // 如果当前没有在拖动，就处理单点击事件
         if(!this.isDragging){
-            console.log(key);
             this.dateList.forEach(date => {
                 if(date.key == key){
                     date.setChecked(!date.isChecked)
@@ -148,7 +147,7 @@ export default class Calender{
     }
     // 根据点击或者拖动的数据，计算出勾选的最小最大的index值
     getMaxAndMinIndex(){
-        let result = { max:0, min:0 }
+        let result = { max:10000, min:10000 }
 
         if (!this.startIndex || !this.endIndex) {
             return result
@@ -176,6 +175,7 @@ export default class Calender{
                 date.setChecked(true)
             }
         })
+        this.checkedTimePeriod()
     }
     // 清楚已选项
     clearSelect(){
