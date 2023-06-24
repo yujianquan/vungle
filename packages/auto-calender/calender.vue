@@ -7,6 +7,7 @@ export default {
         CalenderComp
     },
     render(){
+        // 这里做效果展示，暂时不做props数据绑定
         return (
             <calender-comp />
         )
